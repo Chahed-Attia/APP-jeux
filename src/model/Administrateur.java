@@ -1,6 +1,6 @@
 package model;
 
-public class Administrateur extends Joueur {
+public class Administrateur extends Testeur {
 
     public Administrateur(String pseudo) {
         super(pseudo);
