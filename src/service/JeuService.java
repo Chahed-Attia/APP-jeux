@@ -67,12 +67,11 @@ public class JeuService {
                     // Données du support
                     String anneeSortie = colonnes[3].trim();
                     String developpeur = colonnes[15].trim();
-                    float nbVentesMondiales = colonnes[10].isEmpty() ? 0 : Float.parseFloat(colonnes[10].trim());
-                    int nbCritiquesTesteurs = colonnes[12].isEmpty() ? 0 : Integer.parseInt(colonnes[12].trim());
-                    float scoreMoyenNormaliseCritiquesTesteurs = colonnes[11].isEmpty() ? 0 : Float.parseFloat(colonnes[11].trim());
-                    float nbEvaluationsJoueurs = colonnes[14].isEmpty() ? 0 : Float.parseFloat(colonnes[14].trim());
-                    float scoreMoyenNormaliseEvaluationsJoueurs = colonnes[13].isEmpty() ? 0 : Float.parseFloat(colonnes[13].trim());
-                    
+                    float nbVentesMondiales = (colonnes[10].isEmpty() || colonnes[10].trim().equalsIgnoreCase("tbd")) ? 0 : Float.parseFloat(colonnes[10].trim());
+                    int nbCritiquesTesteurs = (colonnes[12].isEmpty() || colonnes[12].trim().equalsIgnoreCase("tbd")) ? 0 : (int) Float.parseFloat(colonnes[12].trim());
+                    float scoreMoyenNormaliseCritiquesTesteurs = (colonnes[11].isEmpty() || colonnes[11].trim().equalsIgnoreCase("tbd")) ? 0 : Float.parseFloat(colonnes[11].trim());
+                    float nbEvaluationsJoueurs = (colonnes[14].isEmpty() || colonnes[14].trim().equalsIgnoreCase("tbd")) ? 0 : Float.parseFloat(colonnes[14].trim());
+                    float scoreMoyenNormaliseEvaluationsJoueurs = (colonnes[13].isEmpty() || colonnes[13].trim().equalsIgnoreCase("tbd")) ? 0 : Float.parseFloat(colonnes[13].trim());
                     // Créer l'objet Support
                     Support support = new Support(
                             plateformeSupport,
