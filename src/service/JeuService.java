@@ -139,4 +139,24 @@ public class JeuService {
     public List<JeuVideo> getBibliothequeDeJeu() {
         return bibliothequeDeJeu;
     }
+
+    public JeuVideo rechercherParNom(String nom) {
+        for (JeuVideo jeu : bibliothequeDeJeu) {
+            if (jeu.getNom().equalsIgnoreCase(nom)) {
+                return jeu;
+            }
+        }
+        return null;
+    }
+
+    public List<JeuVideo> rechercherParMotCle(String motCle) {
+        List<JeuVideo> resultats = new ArrayList<>();
+        String rechercheLower = motCle.toLowerCase();
+        for (JeuVideo jeu : bibliothequeDeJeu) {
+            if (jeu.getNom().toLowerCase().contains(rechercheLower)) {
+                resultats.add(jeu);
+            }
+        }
+        return resultats;
+    }
 }

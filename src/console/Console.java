@@ -1,6 +1,7 @@
 package console;
 
 import model.*;
+import service.EvaluationService;
 import service.JeuService;
 import service.MembreService;
 
@@ -9,23 +10,24 @@ import java.util.Scanner;
 
 /**
  * Classe Console : gère l'interaction utilisateur en mode console.
- * Affiche les menus selon le profil connecté :
- *   - currentUser == null      → invité (pas de classe, juste non connecté)
- *   - currentUser est Joueur   → menu joueur
- *   - currentUser est Testeur  → menu testeur
- *   - currentUser est Admin    → menu administrateur
+ * - currentUser == null         → invité (pas de classe, non connecté)
+ * - currentUser est Joueur      → menu joueur
+ * - currentUser est Testeur     → menu testeur
+ * - currentUser est Administrateur → menu administrateur
  */
 public class Console {
 
     private final Scanner scanner;
     private final JeuService jeuService;
     private final MembreService membreService;
-    private Membre currentUser; // null = invité (non connecté)
+    private final EvaluationService evaluationService;
+    private Membre currentUser;
 
-    public Console(JeuService jeuService, MembreService membreService) {
+    public Console(JeuService jeuService, MembreService membreService, EvaluationService evaluationService) {
         this.scanner = new Scanner(System.in);
         this.jeuService = jeuService;
         this.membreService = membreService;
+        this.evaluationService = evaluationService;
         this.currentUser = null;
     }
 
@@ -54,9 +56,6 @@ public class Console {
 
     // ===================== MENUS =====================
 
-    /**
-     * Menu invité : utilisateur non connecté (pas de classe associée).
-     */
     private boolean menuInvite() {
         System.out.println("\n========== MENU INVITÉ ==========");
         System.out.println("1. Se connecter");
@@ -79,9 +78,6 @@ public class Console {
         return false;
     }
 
-    /**
-     * Menu joueur : Membre connecté de type Joueur.
-     */
     private boolean menuJoueur() {
         System.out.println("\n========== MENU JOUEUR (" + currentUser.getPseudo() + ") ==========");
         System.out.println("1. Rechercher un jeu");
@@ -118,9 +114,6 @@ public class Console {
         return false;
     }
 
-    /**
-     * Menu testeur : tout ce que Joueur a + écrire tests, signaler évaluations.
-     */
     private boolean menuTesteur() {
         System.out.println("\n========== MENU TESTEUR (" + currentUser.getPseudo() + ") ==========");
         System.out.println("1. Rechercher un jeu");
@@ -163,9 +156,6 @@ public class Console {
         return false;
     }
 
-    /**
-     * Menu admin : tout ce que Testeur a + promouvoir, bloquer, supprimer.
-     */
     private boolean menuAdministrateur() {
         System.out.println("\n========== MENU ADMINISTRATEUR (" + currentUser.getPseudo() + ") ==========");
         System.out.println("1. Rechercher un jeu");
@@ -200,11 +190,8 @@ public class Console {
         return false;
     }
 
-    // ===================== ACTIONS CONNEXION / INSCRIPTION =====================
+    // ===================== CONNEXION / INSCRIPTION =====================
 
-    /**
-     * Connexion par pseudo.
-     */
     private void seConnecter() {
         String pseudo = lireChaine("Entrez votre pseudo : ");
         Membre membre = membreService.rechercherParPseudo(pseudo);
@@ -227,9 +214,6 @@ public class Console {
         System.out.println("Connexion réussie en tant que " + type + " : " + pseudo);
     }
 
-    /**
-     * Inscription d'un nouveau joueur.
-     */
     private void inscrireJoueur() {
         String pseudo = lireChaine("Choisissez un pseudo : ");
 
@@ -253,9 +237,6 @@ public class Console {
         System.out.println("Inscription réussie ! Connectez-vous avec '" + pseudo + "'.");
     }
 
-    /**
-     * Désinscription du joueur connecté.
-     */
     private void seDesinscrire() {
         String confirmation = lireChaine("Êtes-vous sûr de vouloir vous désinscrire ? (oui/non) : ");
         if (confirmation.equalsIgnoreCase("oui")) {
@@ -267,9 +248,6 @@ public class Console {
         }
     }
 
-    /**
-     * Déconnexion.
-     */
     private void seDeconnecter() {
         System.out.println("Déconnexion de " + currentUser.getPseudo() + ".");
         currentUser = null;
@@ -277,9 +255,6 @@ public class Console {
 
     // ===================== ACTIONS JEUX =====================
 
-    /**
-     * Rechercher un jeu par mot-clé.
-     */
     private void rechercherJeu() {
         String recherche = lireChaine("Entrez le nom du jeu à rechercher : ");
         List<JeuVideo> resultats = jeuService.rechercherParMotCle(recherche);
@@ -295,9 +270,6 @@ public class Console {
         }
     }
 
-    /**
-     * Consulter les informations détaillées d'un jeu.
-     */
     private void consulterInfosJeu() {
         String nomJeu = lireChaine("Nom du jeu : ");
         JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
@@ -320,11 +292,17 @@ public class Console {
                     + " | Score critiques: " + s.getScoreMoyenNormaliseCritiquesTesteurs() + "/100"
                     + " | Score joueurs: " + s.getScoreMoyenNormaliseEvaluationsJoueurs() + "/10");
         }
+
+        // Afficher les évaluations s'il y en a
+        List<Evaluation> evals = evaluationService.getEvaluationsParJeu(nomJeu);
+        if (!evals.isEmpty()) {
+            System.out.println("\n--- Évaluations ---");
+            for (Evaluation e : evals) {
+                System.out.println(e);
+            }
+        }
     }
 
-    /**
-     * Consulter le test d'un jeu.
-     */
     private void consulterTestJeu() {
         String nomJeu = lireChaine("Nom du jeu : ");
         JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
@@ -334,13 +312,17 @@ public class Console {
             return;
         }
 
-        // TODO: afficher le test du jeu quand la classe Test sera créée
-        System.out.println("Aucun test disponible pour '" + jeu.getNom() + "' pour le moment.");
+        List<Test> testsJeu = evaluationService.getTestsParJeu(nomJeu);
+        if (testsJeu.isEmpty()) {
+            System.out.println("Aucun test disponible pour '" + jeu.getNom() + "'.");
+        } else {
+            System.out.println("\n--- Tests pour " + jeu.getNom() + " ---");
+            for (Test t : testsJeu) {
+                System.out.println(t);
+            }
+        }
     }
 
-    /**
-     * Ajouter un jeu à la liste du joueur.
-     */
     private void ajouterJeuAMaListe() {
         String nomJeu = lireChaine("Nom du jeu à ajouter : ");
         JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
@@ -350,13 +332,17 @@ public class Console {
             return;
         }
 
-        // TODO: ajouter le jeu à la liste des jeux du joueur
+        Joueur joueur = (Joueur) currentUser;
+
+        if (joueur.possedeJeu(nomJeu)) {
+            System.out.println("Vous possédez déjà ce jeu.");
+            return;
+        }
+
+        joueur.ajouterJeu(nomJeu);
         System.out.println("Jeu '" + jeu.getNom() + "' ajouté à votre liste.");
     }
 
-    /**
-     * Ajouter du temps de jeu.
-     */
     private void ajouterTempsDeJeu() {
         String nomJeu = lireChaine("Nom du jeu : ");
         JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
@@ -366,21 +352,25 @@ public class Console {
             return;
         }
 
+        Joueur joueur = (Joueur) currentUser;
+
+        if (!joueur.possedeJeu(nomJeu)) {
+            System.out.println("Vous ne possédez pas ce jeu. Ajoutez-le d'abord.");
+            return;
+        }
+
         int heures = lireEntier("Nombre d'heures jouées à ajouter : ");
         if (heures <= 0) {
             System.out.println("Le nombre d'heures doit être positif.");
             return;
         }
 
-        // TODO: ajouter les heures au jeu du joueur
-        System.out.println(heures + "h ajoutées pour '" + jeu.getNom() + "'.");
+        joueur.ajouterTempsDeJeu(nomJeu, heures);
+        System.out.println(heures + "h ajoutées. Total pour '" + jeu.getNom() + "' : " + joueur.getTempsDeJeu(nomJeu) + "h.");
     }
 
     // ===================== ACTIONS ÉVALUATIONS =====================
 
-    /**
-     * Écrire une évaluation pour un jeu possédé.
-     */
     private void ecrireEvaluation() {
         String nomJeu = lireChaine("Nom du jeu à évaluer : ");
         JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
@@ -390,67 +380,135 @@ public class Console {
             return;
         }
 
-        // TODO: vérifier que le joueur possède le jeu et y a joué assez longtemps
+        Joueur joueur = (Joueur) currentUser;
+
+        if (!joueur.possedeJeu(nomJeu)) {
+            System.out.println("Vous devez posséder ce jeu pour l'évaluer.");
+            return;
+        }
+
+        if (joueur.getTempsDeJeu(nomJeu) < 1) {
+            System.out.println("Vous devez avoir joué au moins 1h pour évaluer ce jeu.");
+            return;
+        }
+
+        // Choisir le support
+        System.out.println("Supports disponibles :");
+        List<Support> supports = jeu.getSupports();
+        for (int i = 0; i < supports.size(); i++) {
+            System.out.println((i + 1) + ". " + supports.get(i).getNom());
+        }
+        int choixSupport = lireEntier("Choisissez un support : ") - 1;
+        if (choixSupport < 0 || choixSupport >= supports.size()) {
+            System.out.println("Choix invalide.");
+            return;
+        }
+        String support = supports.get(choixSupport).getNom();
+
         String texte = lireChaine("Texte de l'évaluation : ");
+        String version = lireChaine("Numéro de version/build : ");
         int note = lireEntier("Note globale (1-10) : ");
 
-        // TODO: créer l'objet Evaluation et l'associer au jeu
-        System.out.println("Évaluation enregistrée pour '" + jeu.getNom() + "'. (note: " + note + ")");
+        if (note < 1 || note > 10) {
+            System.out.println("La note doit être entre 1 et 10.");
+            return;
+        }
+
+        Evaluation eval = new Evaluation(joueur.getPseudo(), nomJeu, support, texte, version, note);
+        evaluationService.ajouterEvaluation(eval);
+        System.out.println("Évaluation enregistrée pour '" + jeu.getNom() + "' (" + support + ").");
     }
 
-    /**
-     * Évaluer une évaluation existante (+/neutre/-).
-     */
     private void evaluerEvaluation() {
         String nomJeu = lireChaine("Nom du jeu : ");
-        JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
+        List<Evaluation> evals = evaluationService.getEvaluationsParJeu(nomJeu);
 
-        if (jeu == null) {
-            System.out.println("Jeu introuvable.");
+        if (evals.isEmpty()) {
+            System.out.println("Aucune évaluation disponible pour ce jeu.");
             return;
         }
 
-        // TODO: afficher les évaluations et permettre de voter
-        System.out.println("Aucune évaluation disponible pour '" + jeu.getNom() + "' pour le moment.");
+        System.out.println("\n--- Évaluations ---");
+        for (int i = 0; i < evals.size(); i++) {
+            System.out.println((i + 1) + ". " + evals.get(i));
+        }
+
+        int choix = lireEntier("Numéro de l'évaluation à évaluer : ") - 1;
+        if (choix < 0 || choix >= evals.size()) {
+            System.out.println("Choix invalide.");
+            return;
+        }
+
+        Evaluation eval = evals.get(choix);
+
+        if (eval.getAuteurPseudo().equalsIgnoreCase(currentUser.getPseudo())) {
+            System.out.println("Vous ne pouvez pas évaluer votre propre évaluation.");
+            return;
+        }
+
+        System.out.println("1. Positif (+)");
+        System.out.println("2. Neutre");
+        System.out.println("3. Négatif (-)");
+        int vote = lireEntier("Votre vote : ");
+
+        switch (vote) {
+            case 1 -> { eval.ajouterVotePositif(); System.out.println("Vote positif enregistré."); }
+            case 2 -> { eval.ajouterVoteNeutre(); System.out.println("Vote neutre enregistré."); }
+            case 3 -> { eval.ajouterVoteNegatif(); System.out.println("Vote négatif enregistré."); }
+            default -> System.out.println("Choix invalide.");
+        }
     }
 
-    /**
-     * Signaler une évaluation problématique (testeur).
-     */
     private void signalerEvaluation() {
         String nomJeu = lireChaine("Nom du jeu : ");
-        JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
+        List<Evaluation> evals = evaluationService.getEvaluationsParJeu(nomJeu);
 
-        if (jeu == null) {
-            System.out.println("Jeu introuvable.");
+        if (evals.isEmpty()) {
+            System.out.println("Aucune évaluation pour ce jeu.");
             return;
         }
 
-        // TODO: afficher les évaluations et permettre de signaler
-        System.out.println("Aucune évaluation à signaler pour '" + jeu.getNom() + "' pour le moment.");
+        System.out.println("\n--- Évaluations ---");
+        for (int i = 0; i < evals.size(); i++) {
+            System.out.println((i + 1) + ". " + evals.get(i));
+        }
+
+        int choix = lireEntier("Numéro de l'évaluation à signaler : ") - 1;
+        if (choix < 0 || choix >= evals.size()) {
+            System.out.println("Choix invalide.");
+            return;
+        }
+
+        evals.get(choix).signaler();
+        System.out.println("Évaluation signalée avec succès.");
     }
 
-    /**
-     * Supprimer une évaluation problématique (administrateur).
-     */
     private void supprimerEvaluation() {
         String nomJeu = lireChaine("Nom du jeu : ");
-        JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
+        List<Evaluation> evals = evaluationService.getEvaluationsParJeu(nomJeu);
 
-        if (jeu == null) {
-            System.out.println("Jeu introuvable.");
+        if (evals.isEmpty()) {
+            System.out.println("Aucune évaluation pour ce jeu.");
             return;
         }
 
-        // TODO: afficher les évaluations et permettre de supprimer
-        System.out.println("Aucune évaluation à supprimer pour '" + jeu.getNom() + "' pour le moment.");
+        System.out.println("\n--- Évaluations ---");
+        for (int i = 0; i < evals.size(); i++) {
+            System.out.println((i + 1) + ". " + evals.get(i));
+        }
+
+        int choix = lireEntier("Numéro de l'évaluation à supprimer : ") - 1;
+        if (choix < 0 || choix >= evals.size()) {
+            System.out.println("Choix invalide.");
+            return;
+        }
+
+        evaluationService.supprimerEvaluation(evals.get(choix));
+        System.out.println("Évaluation supprimée.");
     }
 
     // ===================== ACTIONS TESTS (TESTEUR) =====================
 
-    /**
-     * Écrire un test pour un jeu (testeur).
-     */
     private void ecrireTest() {
         String nomJeu = lireChaine("Nom du jeu à tester : ");
         JeuVideo jeu = jeuService.rechercherParNom(nomJeu);
@@ -460,30 +518,101 @@ public class Console {
             return;
         }
 
-        // TODO: vérifier que le testeur possède le jeu et y a joué un temps minimal
+        Joueur joueur = (Joueur) currentUser;
+
+        if (!joueur.possedeJeu(nomJeu)) {
+            System.out.println("Vous devez posséder ce jeu pour le tester.");
+            return;
+        }
+
+        if (joueur.getTempsDeJeu(nomJeu) < 5) {
+            System.out.println("Vous devez avoir joué au moins 5h pour tester ce jeu.");
+            return;
+        }
+
+        // Choisir le support
+        System.out.println("Supports disponibles :");
+        List<Support> supports = jeu.getSupports();
+        for (int i = 0; i < supports.size(); i++) {
+            System.out.println((i + 1) + ". " + supports.get(i).getNom());
+        }
+        int choixSupport = lireEntier("Choisissez un support : ") - 1;
+        if (choixSupport < 0 || choixSupport >= supports.size()) {
+            System.out.println("Choix invalide.");
+            return;
+        }
+        String support = supports.get(choixSupport).getNom();
+
+        // Vérifier qu'il n'existe pas déjà un test pour ce support
+        if (evaluationService.getTestParJeuEtSupport(nomJeu, support) != null) {
+            System.out.println("Un test existe déjà pour ce jeu sur ce support.");
+            return;
+        }
+
         String texte = lireChaine("Texte du test : ");
         String version = lireChaine("Numéro de version/build : ");
 
-        // TODO: créer l'objet Test et libérer les jetons placés sur ce jeu
-        System.out.println("Test publié pour '" + jeu.getNom() + "'.");
+        Test test = new Test(currentUser.getPseudo(), nomJeu, support, texte, version);
+
+        // Notes par catégorie
+        System.out.println("Notes par catégorie (0-20). Laissez le nom vide pour terminer.");
+        while (true) {
+            String categorie = lireChaine("Catégorie (ex: gameplay, interface, optimisation) : ");
+            if (categorie.isEmpty()) break;
+            int note = lireEntier("Note pour " + categorie + " (0-20) : ");
+            test.ajouterNote(categorie, note);
+        }
+
+        // Points forts (optionnel)
+        String pointFort = lireChaine("Point fort (laisser vide pour passer) : ");
+        while (!pointFort.isEmpty()) {
+            test.ajouterPointFort(pointFort);
+            pointFort = lireChaine("Autre point fort (laisser vide pour terminer) : ");
+        }
+
+        // Points faibles (optionnel)
+        String pointFaible = lireChaine("Point faible (laisser vide pour passer) : ");
+        while (!pointFaible.isEmpty()) {
+            test.ajouterPointFaible(pointFaible);
+            pointFaible = lireChaine("Autre point faible (laisser vide pour terminer) : ");
+        }
+
+        evaluationService.ajouterTest(test);
+
+        // Le testeur gagne 5 jetons pour chaque test publié
+        currentUser.setJetons(currentUser.getJetons() + 5);
+
+        System.out.println("Test publié pour '" + jeu.getNom() + "' (" + support + "). +5 jetons !");
     }
 
-    /**
-     * Rechercher un test à réaliser (par jetons décroissants).
-     */
     private void rechercherTestARealiser() {
-        // TODO: afficher les jeux par nombre de jetons décroissant
-        // TODO: le testeur doit posséder le jeu et y avoir joué un temps minimal
-        System.out.println("Fonctionnalité à compléter (nécessite le système de jetons par jeu).");
+        Joueur joueur = (Joueur) currentUser;
+
+        System.out.println("\n--- Jeux en attente de test (que vous possédez avec 5h+ de jeu) ---");
+        List<JeuVideo> tousLesJeux = jeuService.getBibliothequeDeJeu();
+        boolean aucunResultat = true;
+
+        for (JeuVideo jeu : tousLesJeux) {
+            if (joueur.possedeJeu(jeu.getNom()) && joueur.getTempsDeJeu(jeu.getNom()) >= 5) {
+                for (Support s : jeu.getSupports()) {
+                    if (evaluationService.getTestParJeuEtSupport(jeu.getNom(), s.getNom()) == null) {
+                        System.out.println("- " + jeu.getNom() + " (" + s.getNom() + ") [" + jeu.getGenre() + "]");
+                        aucunResultat = false;
+                    }
+                }
+            }
+        }
+
+        if (aucunResultat) {
+            System.out.println("Aucun jeu éligible pour un test.");
+        }
     }
 
     // ===================== ACTIONS JETONS =====================
 
-    /**
-     * Placer ou retirer un jeton sur un jeu.
-     */
     private void gererJetons() {
-        System.out.println("Jetons disponibles : " + currentUser.getJetons());
+        Joueur joueur = (Joueur) currentUser;
+        System.out.println("Jetons disponibles : " + joueur.getJetons());
         System.out.println("1. Placer un jeton");
         System.out.println("2. Retirer un jeton");
         int choix = lireEntier("Votre choix : ");
@@ -498,16 +627,22 @@ public class Console {
 
         switch (choix) {
             case 1 -> {
-                if (currentUser.getJetons() <= 0) {
-                    System.out.println("Vous n'avez plus de jetons disponibles.");
+                if (joueur.placerJeton(nomJeu)) {
+                    System.out.println("Jeton placé sur '" + jeu.getNom() + "'. "
+                            + "Jetons restants : " + joueur.getJetons()
+                            + " | Jetons sur ce jeu : " + joueur.getJetonsPlacesSur(nomJeu));
                 } else {
-                    currentUser.setJetons(currentUser.getJetons() - 1);
-                    System.out.println("Jeton placé sur '" + jeu.getNom() + "'. Jetons restants : " + currentUser.getJetons());
+                    System.out.println("Vous n'avez plus de jetons disponibles.");
                 }
             }
             case 2 -> {
-                currentUser.setJetons(currentUser.getJetons() + 1);
-                System.out.println("Jeton retiré de '" + jeu.getNom() + "'. Jetons restants : " + currentUser.getJetons());
+                if (joueur.retirerJeton(nomJeu)) {
+                    System.out.println("Jeton retiré de '" + jeu.getNom() + "'. "
+                            + "Jetons restants : " + joueur.getJetons()
+                            + " | Jetons sur ce jeu : " + joueur.getJetonsPlacesSur(nomJeu));
+                } else {
+                    System.out.println("Vous n'avez aucun jeton placé sur ce jeu.");
+                }
             }
             default -> System.out.println("Choix invalide.");
         }
@@ -515,9 +650,6 @@ public class Console {
 
     // ===================== ACTIONS ADMIN =====================
 
-    /**
-     * Consulter les informations d'un membre.
-     */
     private void consulterInfosMembre() {
         String pseudo = lireChaine("Pseudo du membre à consulter : ");
         Membre membre = membreService.rechercherParPseudo(pseudo);
@@ -529,11 +661,15 @@ public class Console {
 
         System.out.println("\n--- Informations du membre ---");
         System.out.println(membre);
+
+        if (membre instanceof Joueur joueur) {
+            System.out.println("Jeux possédés : " + joueur.getJeuxPossedes().size());
+            int totalHeures = joueur.getJeuxPossedes().values().stream().mapToInt(Integer::intValue).sum();
+            System.out.println("Durée de jeu globale : " + totalHeures + "h");
+            System.out.println("Évaluations écrites : " + evaluationService.compterEvaluationsParAuteur(pseudo));
+        }
     }
 
-    /**
-     * Promouvoir un membre : Joueur → Testeur → Administrateur.
-     */
     private void promouvoirMembre() {
         String pseudo = lireChaine("Pseudo du membre à promouvoir : ");
         Membre membre = membreService.rechercherParPseudo(pseudo);
@@ -558,14 +694,9 @@ public class Console {
             Testeur testeur = new Testeur(pseudo);
             membreService.ajouterMembre(testeur);
             System.out.println("'" + pseudo + "' promu de Joueur à Testeur.");
-        } else {
-            System.out.println("Seuls les joueurs et testeurs peuvent être promus.");
         }
     }
 
-    /**
-     * Bloquer/débloquer un membre.
-     */
     private void bloquerMembre() {
         String pseudo = lireChaine("Pseudo du membre à bloquer/débloquer : ");
         Membre membre = membreService.rechercherParPseudo(pseudo);
@@ -585,9 +716,6 @@ public class Console {
         System.out.println("Le membre '" + pseudo + "' a été " + statut + ".");
     }
 
-    /**
-     * Désinscrire un membre (par un administrateur).
-     */
     private void desinscrireMembre() {
         String pseudo = lireChaine("Pseudo du membre à désinscrire : ");
         Membre membre = membreService.rechercherParPseudo(pseudo);
@@ -608,11 +736,6 @@ public class Console {
 
     // ===================== UTILITAIRES =====================
 
-    /**
-     * Lit un entier depuis la console avec gestion d'erreur.
-     * @param message le message affiché à l'utilisateur
-     * @return l'entier saisi
-     */
     private int lireEntier(String message) {
         while (true) {
             try {
@@ -624,11 +747,6 @@ public class Console {
         }
     }
 
-    /**
-     * Lit une chaîne de caractères depuis la console.
-     * @param message le message affiché à l'utilisateur
-     * @return la chaîne saisie
-     */
     private String lireChaine(String message) {
         System.out.print(message);
         return scanner.nextLine().trim();
