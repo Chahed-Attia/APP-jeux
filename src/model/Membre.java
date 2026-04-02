@@ -11,8 +11,28 @@ public class Membre {
         this.bloque = false;
     }
 
+    // === Ce que tu avais déjà ===
+
     public String getPseudo() {
         return pseudo;
+    }
+
+    // === Ce qu'il faut ajouter ===
+
+    public int getJetons() {
+        return jetons;
+    }
+
+    public void setJetons(int jetons) {
+        this.jetons = jetons;
+    }
+
+    public boolean isBloque() {
+        return bloque;
+    }
+
+    public void setBloque(boolean bloque) {
+        this.bloque = bloque;
     }
 
     @Override
