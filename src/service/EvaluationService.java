@@ -8,9 +8,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service pour gérer les évaluations de joueurs et les tests de testeurs.
- */
 public class EvaluationService {
 
     private List<Evaluation> evaluations;
@@ -23,16 +20,12 @@ public class EvaluationService {
 
     // ===================== ÉVALUATIONS =====================
 
-    /**
-     * Ajoute une évaluation.
-     */
     public void ajouterEvaluation(Evaluation eval) {
         evaluations.add(eval);
     }
 
-    /**
-     * Récupère toutes les évaluations d'un jeu (tous supports),
-     * triées par meilleure note puis par date la plus ancienne.
+    /**Je récupère toutes les évaluations d'un jeu (tous supports),
+     et je trie par meilleure note puis par date la plus ancienne.
      */
     public List<Evaluation> getEvaluationsParJeu(String nomJeu) {
         return evaluations.stream()
@@ -42,8 +35,7 @@ public class EvaluationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Récupère les évaluations d'un jeu sur un support précis.
+    /** Je récupère les évaluations d'un jeu sur un support précis.
      */
     public List<Evaluation> getEvaluationsParJeuEtSupport(String nomJeu, String support) {
         return evaluations.stream()
@@ -54,8 +46,7 @@ public class EvaluationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Compte les évaluations écrites par un membre.
+    /**Je compte les évaluations écrites par un membre.
      */
     public int compterEvaluationsParAuteur(String pseudo) {
         return (int) evaluations.stream()
@@ -63,8 +54,7 @@ public class EvaluationService {
                 .count();
     }
 
-    /**
-     * Compte le total de votes positifs reçus par un auteur.
+    /**Je compte le total de votes positifs reçus par un auteur.
      */
     public int compterVotesPositifsAuteur(String pseudo) {
         return evaluations.stream()
@@ -73,8 +63,7 @@ public class EvaluationService {
                 .sum();
     }
 
-    /**
-     * Supprime une évaluation (admin).
+    /**Je supprime une évaluation (admin).
      */
     public boolean supprimerEvaluation(Evaluation eval) {
         return evaluations.remove(eval);
@@ -82,15 +71,13 @@ public class EvaluationService {
 
     // ===================== TESTS =====================
 
-    /**
-     * Ajoute un test.
+    /**Pour ajouter un test.
      */
     public void ajouterTest(Test test) {
         tests.add(test);
     }
 
-    /**
-     * Récupère le test d'un jeu sur un support (au plus un par support).
+    /**Je récupère le test d'un jeu sur un support.
      */
     public Test getTestParJeuEtSupport(String nomJeu, String support) {
         return tests.stream()
@@ -100,8 +87,7 @@ public class EvaluationService {
                 .orElse(null);
     }
 
-    /**
-     * Récupère tous les tests d'un jeu.
+    /**Je récupère tous les tests d'un jeu.
      */
     public List<Test> getTestsParJeu(String nomJeu) {
         return tests.stream()
@@ -109,8 +95,7 @@ public class EvaluationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Compte les tests écrits par un testeur.
+    /**Et je compte les tests écrits par un testeur.
      */
     public int compterTestsParAuteur(String pseudo) {
         return (int) tests.stream()

@@ -10,8 +10,6 @@ public class MembreService {
         membres = new ArrayList<>();
     }
 
-    // === Ce que tu avais déjà ===
-
     public void ajouterMembre(Membre membre) {
         membres.add(membre);
     }
@@ -22,7 +20,6 @@ public class MembreService {
         }
     }
 
-    // === Ce qu'il faut ajouter ===
 
     public Membre rechercherParPseudo(String pseudo) {
         for (Membre membre : membres) {

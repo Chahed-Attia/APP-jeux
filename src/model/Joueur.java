@@ -5,10 +5,9 @@ import java.util.Map;
 
 public class Joueur extends Membre {
 
-    // Map : nom du jeu → heures jouées
+
     private Map<String, Integer> jeuxPossedes;
 
-    // Map : nom du jeu → nombre de jetons placés sur ce jeu
     private Map<String, Integer> jetonsPlaces;
 
     public Joueur(String pseudo) {

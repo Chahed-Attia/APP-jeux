@@ -84,4 +84,9 @@ public class Support {
     public void setScoreMoyenNormaliseEvaluationsJoueurs(float scoreMoyenNormaliseEvaluationsJoueurs) {
         this.scoreMoyenNormaliseEvaluationsJoueurs = scoreMoyenNormaliseEvaluationsJoueurs;
     }
+
+    @Override
+    public String toString() {
+        return "Support{" + nom + ", " + anneeSortie + ", ventes=" + nbVentesMondiales + "M}";
+    }
 }

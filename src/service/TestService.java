@@ -11,28 +11,20 @@ public class TestService {
         System.out.println("║          TESTS DE LA CLASSE JeuService                    ║");
         System.out.println("╚════════════════════════════════════════════════════════════╝\n");
         
-        // Cas 1: Ajouter un jeu manuellement
         test1_AjouterJeuManuel();
         
-        // Cas 2: Afficher un jeu
         test2_AfficherJeu();
         
-        // Cas 3: Charger depuis le fichier CSV
         test3_ChargerDepuisCSV();
         
-        // Cas 4: Vérifier le nombre de jeux chargés
         test4_VerifierNombreJeux();
         
-        // Cas 5: Rechercher un jeu par nom
         test5_RechercherJeuParNom();
         
-        // Cas 6: Compter les jeux par genre
         test6_CompterParGenre();
         
-        // Cas 7: Trouver le jeu avec le plus de ventes
         test7_JeuPlusVentes();
         
-        // Cas 8: Afficher les jeux multi-supports
         test8_JeuxMultiSupports();
     }
     
@@ -40,7 +32,7 @@ public class TestService {
     // CAS 1: Ajouter un jeu manuellement avec supports multiples
     // ═══════════════════════════════════════════════════════════════════════
     public static void test1_AjouterJeuManuel() {
-        System.out.println("🧪 CAS 1: AJOUTER UN JEU MANUELLEMENT");
+        System.out.println("CAS 1: AJOUTER UN JEU MANUELLEMENT");
         System.out.println("─────────────────────────────────────");
         
         JeuService service = new JeuService();
@@ -65,7 +57,7 @@ public class TestService {
     // CAS 2: Afficher les jeux dans la bibliothèque
     // ═══════════════════════════════════════════════════════════════════════
     public static void test2_AfficherJeu() {
-        System.out.println("🧪 CAS 2: AFFICHER LES JEUX");
+        System.out.println("CAS 2: AFFICHER LES JEUX");
         System.out.println("───────────────────────────");
         
         JeuService service = new JeuService();
@@ -80,7 +72,7 @@ public class TestService {
         service.ajouterJeu(jeu1);
         service.ajouterJeu(jeu2);
         
-        System.out.println("✓ Affichage de " + service.getBibliothequeDeJeu().size() + " jeu(x):");
+        System.out.println("Affichage de " + service.getBibliothequeDeJeu().size() + " jeu(x):");
         service.afficherJeux();
         System.out.println();
     }
@@ -89,13 +81,13 @@ public class TestService {
     // CAS 3: Charger depuis le fichier CSV
     // ═══════════════════════════════════════════════════════════════════════
     public static void test3_ChargerDepuisCSV() {
-        System.out.println("🧪 CAS 3: CHARGER DEPUIS LE FICHIER CSV");
+        System.out.println("CAS 3: CHARGER DEPUIS LE FICHIER CSV");
         System.out.println("───────────────────────────────────────");
         
         JeuService service = new JeuService();
         String cheminFichier = "data/vg_data.csv";
         
-        System.out.println("📂 Chargement du fichier: " + cheminFichier);
+        System.out.println("Chargement du fichier: " + cheminFichier);
         service.chargerJeuVideo(cheminFichier);
         
         System.out.println();
@@ -105,14 +97,14 @@ public class TestService {
     // CAS 4: Vérifier le nombre de jeux chargés
     // ═══════════════════════════════════════════════════════════════════════
     public static void test4_VerifierNombreJeux() {
-        System.out.println("🧪 CAS 4: VÉRIFIER LE NOMBRE DE JEUX");
+        System.out.println("CAS 4: VÉRIFIER LE NOMBRE DE JEUX");
         System.out.println("────────────────────────────────────");
         
         JeuService service = new JeuService();
         service.chargerJeuVideo("data/vg_data.csv");
         
         int total = service.getBibliothequeDeJeu().size();
-        System.out.println("✓ Nombre total de jeux: " + total);
+        System.out.println("Nombre total de jeux: " + total);
         
         if (total > 0) {
             System.out.println("  Premier jeu: " + service.getBibliothequeDeJeu().get(0));
@@ -125,7 +117,7 @@ public class TestService {
     // CAS 5: Rechercher un jeu par nom
     // ═══════════════════════════════════════════════════════════════════════
     public static void test5_RechercherJeuParNom() {
-        System.out.println("🧪 CAS 5: RECHERCHER UN JEU PAR NOM");
+        System.out.println("CAS 5: RECHERCHER UN JEU PAR NOM");
         System.out.println("───────────────────────────────────");
         
         JeuService service = new JeuService();
@@ -142,9 +134,9 @@ public class TestService {
         }
         
         if (resultat != null) {
-            System.out.println("✓ Jeu trouvé: " + resultat);
+            System.out.println("Jeu trouvé: " + resultat);
         } else {
-            System.out.println("✗ Jeu non trouvé: " + nomRecherche);
+            System.out.println("Jeu non trouvé: " + nomRecherche);
         }
         System.out.println();
     }
@@ -153,7 +145,7 @@ public class TestService {
     // CAS 6: Compter les jeux par genre
     // ═══════════════════════════════════════════════════════════════════════
     public static void test6_CompterParGenre() {
-        System.out.println("🧪 CAS 6: COMPTER LES JEUX PAR GENRE");
+        System.out.println("CAS 6: COMPTER LES JEUX PAR GENRE");
         System.out.println("────────────────────────────────────");
         
         JeuService service = new JeuService();
@@ -167,7 +159,7 @@ public class TestService {
             genreCount.put(genre, genreCount.getOrDefault(genre, 0) + 1);
         }
         
-        System.out.println("✓ Répartition par genre:");
+        System.out.println("Répartition par genre:");
         genreCount.entrySet().stream()
             .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
             .limit(5)
@@ -181,7 +173,7 @@ public class TestService {
     // CAS 7: Trouver le jeu avec le plus de ventes mondiales
     // ═══════════════════════════════════════════════════════════════════════
     public static void test7_JeuPlusVentes() {
-        System.out.println("🧪 CAS 7: JEU AVEC LE PLUS DE VENTES");
+        System.out.println("CAS 7: JEU AVEC LE PLUS DE VENTES");
         System.out.println("─────────────────────────────────────");
         
         JeuService service = new JeuService();
@@ -200,10 +192,10 @@ public class TestService {
         }
         
         if (jeuMaxVentes != null) {
-            System.out.println("✓ Jeu avec le plus de ventes: " + jeuMaxVentes.getNom());
-            System.out.println("  Ventes mondiales: " + maxVentes + "M");
-            System.out.println("  Genre: " + jeuMaxVentes.getGenre());
-            System.out.println("  Éditeur: " + jeuMaxVentes.getEditeur());
+            System.out.println("Jeu avec le plus de ventes: " + jeuMaxVentes.getNom());
+            System.out.println("Ventes mondiales: " + maxVentes + "M");
+            System.out.println("Genre: " + jeuMaxVentes.getGenre());
+            System.out.println("Éditeur: " + jeuMaxVentes.getEditeur());
         }
         System.out.println();
     }
@@ -212,13 +204,13 @@ public class TestService {
     // CAS 8: Afficher les jeux disponibles sur plusieurs supports
     // ═══════════════════════════════════════════════════════════════════════
     public static void test8_JeuxMultiSupports() {
-        System.out.println("🧪 CAS 8: JEUX MULTI-SUPPORTS");
+        System.out.println("CAS 8: JEUX MULTI-SUPPORTS");
         System.out.println("──────────────────────────────");
         
         JeuService service = new JeuService();
         service.chargerJeuVideo("data/vg_data.csv");
         
-        System.out.println("✓ Jeux disponibles sur plusieurs supports:");
+        System.out.println("Jeux disponibles sur plusieurs supports:");
         int count = 0;
         for (JeuVideo jeu : service.getBibliothequeDeJeu()) {
             if (jeu.getSupports().size() > 1) {
