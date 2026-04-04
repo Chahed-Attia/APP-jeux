@@ -1,7 +1,7 @@
 # Plateforme d'évaluation collaborative de jeux vidéo
 
-Application Java en mode console pour la gestion et l'évaluation de jeux vidéo.  
-Projet POO — Polytech Paris-Saclay · 2025-2026
+Application Java en mode console pour la gestion et l'évaluation de jeux vidéo.
+Polytech Paris-Saclay · 2025-2026
 
 ---
 
