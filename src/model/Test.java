@@ -7,10 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Représente un test structuré écrit par un testeur pour un jeu vidéo sur un support.
- * Au plus un test par testeur par support.
- */
 public class Test {
     private String auteurPseudo;
     private String nomJeu;
@@ -19,14 +15,11 @@ public class Test {
     private String version;
     private LocalDate date;
 
-    // Notes par catégorie testée (ex: interface=15, gameplay=18, optimisation=12)
     private Map<String, Integer> notesParCategorie;
 
-    // Points forts et faibles (optionnels)
     private List<String> pointsForts;
     private List<String> pointsFaibles;
 
-    // Conditions du test (optionnel)
     private String conditionsTest;
 
     public Test(String auteurPseudo, String nomJeu, String support, String texte, String version) {

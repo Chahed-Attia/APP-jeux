@@ -11,13 +11,11 @@ public class Membre {
         this.bloque = false;
     }
 
-    // === Ce que tu avais déjà ===
+
 
     public String getPseudo() {
         return pseudo;
     }
-
-    // === Ce qu'il faut ajouter ===
 
     public int getJetons() {
         return jetons;

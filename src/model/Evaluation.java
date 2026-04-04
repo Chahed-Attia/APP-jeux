@@ -2,9 +2,7 @@ package model;
 
 import java.time.LocalDate;
 
-/**
- * Représente une évaluation d'un joueur pour un jeu vidéo sur un support donné.
- */
+
 public class Evaluation {
     private String auteurPseudo;
     private String nomJeu;

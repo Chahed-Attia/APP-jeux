@@ -8,13 +8,7 @@ import service.MembreService;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Classe Console : gère l'interaction utilisateur en mode console.
- * - currentUser == null         → invité (pas de classe, non connecté)
- * - currentUser est Joueur      → menu joueur
- * - currentUser est Testeur     → menu testeur
- * - currentUser est Administrateur → menu administrateur
- */
+/**Une classe Console pour gèrer l'interaction utilisateur.*/
 public class Console {
 
     private final Scanner scanner;
@@ -563,14 +557,14 @@ public class Console {
             test.ajouterNote(categorie, note);
         }
 
-        // Points forts (optionnel)
+        // Points forts
         String pointFort = lireChaine("Point fort (laisser vide pour passer) : ");
         while (!pointFort.isEmpty()) {
             test.ajouterPointFort(pointFort);
             pointFort = lireChaine("Autre point fort (laisser vide pour terminer) : ");
         }
 
-        // Points faibles (optionnel)
+        // Points faibles
         String pointFaible = lireChaine("Point faible (laisser vide pour passer) : ");
         while (!pointFaible.isEmpty()) {
             test.ajouterPointFaible(pointFaible);

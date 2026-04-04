@@ -29,9 +29,7 @@ public class JeuService {
     }
 
     public void chargerJeuVideo(String filename) {
-        // Implémentation pour charger les jeux depuis un fichier CSV
-        // Structure: chaque ligne représente un support d'un jeu
-        // Plusieurs lignes peuvent concerner le même jeu (supports multiples)
+        // Je charge les jeux depuis le fichier CSV
         
         Map<String, JeuVideoData> jeuxMap = new HashMap<>();
         
@@ -39,16 +37,15 @@ public class JeuService {
             String ligne;
             int ligneCourante = 0;
             
-            // 1 - Ouvrir le fichier (fait par le try-with-resources)
+            //J'ouvre le fichier
             while ((ligne = reader.readLine()) != null) {
                 ligneCourante++;
                 
-                // Ignorer la première ligne (en-têtes)
                 if (ligneCourante == 1) {
                     continue;
                 }
                 
-                // 2 - Lire chaque ligne du fichier
+                // Lecture de chaque ligne du fichier
                 String[] colonnes = ligne.split(",", -1);
                 
                 if (colonnes.length < 16) {
@@ -72,7 +69,7 @@ public class JeuService {
                     float scoreMoyenNormaliseCritiquesTesteurs = (colonnes[11].isEmpty() || colonnes[11].trim().equalsIgnoreCase("tbd")) ? 0 : Float.parseFloat(colonnes[11].trim());
                     float nbEvaluationsJoueurs = (colonnes[14].isEmpty() || colonnes[14].trim().equalsIgnoreCase("tbd")) ? 0 : Float.parseFloat(colonnes[14].trim());
                     float scoreMoyenNormaliseEvaluationsJoueurs = (colonnes[13].isEmpty() || colonnes[13].trim().equalsIgnoreCase("tbd")) ? 0 : Float.parseFloat(colonnes[13].trim());
-                    // Créer l'objet Support
+                    // Je crée l'objet Support
                     Support support = new Support(
                             plateformeSupport,
                             anneeSortie,
@@ -84,7 +81,7 @@ public class JeuService {
                             scoreMoyenNormaliseEvaluationsJoueurs
                     );
                     
-                    // 3 - Ajouter le support à la liste des supports du jeu
+                    // J'ajoute le support à la liste des supports du jeu
                     if (!jeuxMap.containsKey(nomJeu)) {
                         JeuVideoData jeuData = new JeuVideoData(nomJeu, genre, editeur, rating);
                         jeuData.supports.add(support);
@@ -98,7 +95,7 @@ public class JeuService {
                 }
             }
             
-            // Créer les objets JeuVideo avec leurs supports et les ajouter à la bibliothèque
+            // J e crée les objets JeuVideo avec leurs supports et je les ajoute à la bibliothèque
             for (JeuVideoData jeuData : jeuxMap.values()) {
                 JeuVideo jeuVideo = new JeuVideo(
                         jeuData.nom,
@@ -113,7 +110,7 @@ public class JeuService {
             System.out.println("Chargement réussi : " + bibliothequeDeJeu.size() + " jeu(x) chargé(s)");
             
         } catch (IOException e) {
-            // 4 - Gérer les exceptions potentielles (FileNotFoundException, IOException)
+            // Je gére les exceptions potentielles
             System.err.println("Erreur lors de la lecture du fichier '" + filename + "': " + e.getMessage());
         }
     }
